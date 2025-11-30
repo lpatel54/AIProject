@@ -1,0 +1,90 @@
+# Project Report – AI-Assisted Dungeon Quest Game
+
+## Overview
+
+This report explains how I used AI tools throughout the development of my Python game, what tools I used, where they were helpful, and what challenges I ran into. The goal of the assignment was to meaningfully integrate multiple AI tools into both the development process and the final product, and this project meets those expectations.
+
+---
+
+## AI Tools Used
+
+### 1. Code Assistance (ChatGPT, Gemini, Perplexity)
+I used multiple AI models to help plan, structure, and debug the game. They helped with:
+- Outlining the game loop, battle system, and menu structure.
+- Explaining Python errors and suggesting fixes.
+- Rewriting functions when logic got messy or repetitive.
+- Helping identify why images were not opening correctly.
+- Cleaning up variable names, formatting, and general readability.
+
+I switched between ChatGPT, Perplexity, and Gemini when I needed different explanations or perspectives, and I used them the same way I would normally use a tutor or teaching assistant.
+
+### 2. AI Image Generation (DALL·E, Adobe)
+I used AI image generation tools to create the two main images used by the game:
+- `intro.jpg` — artwork for the title screen.
+- `dragon.jpg` — artwork for the final boss.
+
+These images are part of the actual gameplay, not just decorative assets. The game opens them at specific points (startup and boss encounter), which makes them part of the final product.
+
+### 3. File Conversion (AI-Assisted Python Tool)
+Since DALL·E exports PNGs, I used an AI-managed Python environment to convert:
+- `intro.png` → `intro.jpg`
+- `dragon.png` → `dragon.jpg`
+
+This made the files simpler to work with and kept naming consistent across the program.
+
+### 4. AI for Documentation Support
+I used AI to help:
+- Draft the instructions for running the program.
+- Organize this report.
+- Make everything clear and consistent.
+I edited all text to match my own writing style, focusing on keeping it natural and straightforward.
+
+---
+
+## Development Challenges and AI Assistance
+
+### Image Loading Errors
+The biggest challenge was getting the images to open correctly from Python. Even when the images were in the same folder, Python kept saying they didn’t exist. AI helped me:
+- Print the exact paths Python was using.
+- Realize I was running a different copy of the script from a separate directory.
+- Switch to using `Path(__file__).parent` to guarantee correct paths.
+- Replace browser-based image opening with `os.startfile()` to simplify the process.
+
+This was the part of the assignment where AI helped the most, because the issue was environmental rather than coding-related.
+
+### Structuring the Game Logic
+AI helped me break the game down into clear functions, such as:
+- `main_menu()`
+- `explore_room()`
+- `battle()`
+- `rest()`
+- `fight_boss()`
+
+These suggestions helped me keep the code organized and easier to edit.
+
+---
+
+## Reflection on AI Tools
+
+I used AI in almost every phase of the assignment, but in different ways depending on what I needed. Sometimes AI wrote example code, sometimes it explained errors, and sometimes it helped me think through the problem when I didn’t know what to try next. Working with AI did not replace the need for understanding the code myself. I still had to fix paths, test the game repeatedly, and make adjustments based on how the game felt when I played it.
+
+AI also made the creative parts more fun, like generating the intro artwork and the boss image. Instead of searching for assets online, I was able to generate custom visuals that matched the game.
+
+Overall, AI made the project less stressful and more productive, but I also learned the limits of relying on it. You still have to test things, understand what the code is doing, and solve environment-specific issues manually.
+
+---
+
+## How This Project Meets the Assignment Requirements
+
+- **Programming Language:** The entire project is written in Python.
+- **AI Integration:** Used for code generation, debugging, image creation, file conversion, and documentation.
+- **Multiple Tools:** ChatGPT, Perplexity, Gemini, DALL·E, Adobe image tools, and an AI-assisted conversion environment.
+- **Nontrivial Complexity:** Includes interactive gameplay, multiple events, combat mechanics, items, randomness, and media integration.
+- **Multiple Components:** Logic, images, user interaction, instructions, and a report.
+- **Version Control:** Managed through Git and submitted via GitHub with multiple commits.
+
+---
+
+## Final Notes
+
+This project helped me understand both Python fundamentals and how AI tools can support development. I learned how to balance AI-generated suggestions with my own testing and decision-making, and I ended the project feeling more confident in using AI as a tool rather than a shortcut.
