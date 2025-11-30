@@ -1,0 +1,332 @@
+import random
+import sys
+import os
+from pathlib import Path
+
+# ------------- Image helper -------------
+
+BASE_DIR = Path(__file__).parent
+print("BASE_DIR:", BASE_DIR)  # debug so you can see the folder
+
+def show_image(filename: str):
+    """Open an image file from the same folder in the default image viewer."""
+    path = BASE_DIR / filename
+    print("Trying image:", path)
+
+    # If the file exists, open it. If not, just print a message and continue.
+    if path.exists():
+        os.startfile(path)  # Windows: opens with default app
+    else:
+        print("Image not found (but game will continue):", path)
+
+# ------------- Utility functions -------------
+
+def slow_print(text):
+    print(text)
+
+def line():
+    print("-" * 50)
+
+# ------------- Game data -------------
+
+player = {
+    "name": "",
+    "hp": 30,
+    "max_hp": 30,
+    "attack": 5,
+    "potions": 3,
+    "gold": 0,
+    "rooms_cleared": 0
+}
+
+enemies = [
+    {"name": "Goblin", "hp": 12, "attack": 4},
+    {"name": "Skeleton", "hp": 14, "attack": 5},
+    {"name": "Dark Wolf", "hp": 16, "attack": 6},
+    {"name": "Sorcerer", "hp": 18, "attack": 7},
+]
+
+boss = {"name": "Dungeon Dragon", "hp": 30, "attack": 8}
+
+# ------------- Main menu and banner -------------
+
+def print_banner():
+    line()
+    show_image("intro.jpg")  # opens intro.jpg if found
+    slow_print("DUNGEON QUEST - A Tiny Text Adventure")
+    line()
+
+def main_menu():
+    while True:
+        print_banner()
+        print("1) Start new game")
+        print("2) How to play")
+        print("3) Quit")
+        choice = input("Choose an option: ").strip()
+
+        if choice == "1":
+            start_game()
+        elif choice == "2":
+            show_help()
+        elif choice == "3":
+            slow_print("Goodbye, adventurer.")
+            sys.exit(0)
+        else:
+            slow_print("Please enter 1, 2, or 3.")
+
+# ------------- Help / instructions -------------
+
+def show_help():
+    line()
+    slow_print("HOW TO PLAY")
+    line()
+    slow_print("You explore a small dungeon, room by room.")
+    slow_print("Each room may contain an enemy, treasure, or a special event.")
+    slow_print("In battles you can:")
+    slow_print("  1. Attack")
+    slow_print("  2. Use a potion to heal")
+    slow_print("  3. Try to run away")
+    slow_print("If your HP reaches 0, you lose. Survive long enough and")
+    slow_print("you will face the Dungeon Dragon boss. Defeat it to win.")
+    input("\nPress Enter to return to the menu...")
+
+# ------------- Game setup -------------
+
+def start_game():
+    line()
+    name = input("Enter your hero's name: ").strip()
+    if not name:
+        name = "Hero"
+
+    player["name"] = name
+    player["hp"] = 30
+    player["max_hp"] = 30
+    player["attack"] = 5
+    player["potions"] = 3
+    player["gold"] = 0
+    player["rooms_cleared"] = 0
+
+    slow_print(f"\nWelcome, {player['name']}! Your adventure begins...\n")
+    game_loop()
+
+# ------------- Main game loop -------------
+
+def game_loop():
+    while True:
+        if player["hp"] <= 0:
+            game_over()
+            return
+
+        if player["rooms_cleared"] >= 5:
+            slow_print("\nYou feel a powerful presence deeper in the dungeon...")
+            input("Press Enter to face the Dungeon Dragon...")
+            fight_boss()
+            return
+
+        line()
+        slow_print(
+            f"Status: HP {player['hp']}/{player['max_hp']} | "
+            f"Potions: {player['potions']} | Gold: {player['gold']} "
+            f"| Rooms cleared: {player['rooms_cleared']}"
+        )
+        line()
+        print("What do you want to do?")
+        print("1) Explore the next room")
+        print("2) Rest (small heal)")
+        print("3) View stats")
+        print("4) Give up and leave the dungeon")
+
+        choice = input("Choose an option: ").strip()
+
+        if choice == "1":
+            explore_room()
+        elif choice == "2":
+            rest()
+        elif choice == "3":
+            show_stats()
+        elif choice == "4":
+            slow_print("You leave the dungeon and live to fight another day.")
+            return
+        else:
+            slow_print("Please enter 1, 2, 3, or 4.")
+
+# ------------- Actions -------------
+
+def explore_room():
+    line()
+    slow_print("You step cautiously into the next room...")
+    event = random.choice(["enemy", "treasure", "potion", "mystic", "empty"])
+
+    if event == "enemy":
+        enemy = random.choice(enemies)
+        enemy_copy = enemy.copy()
+        slow_print(f"A wild {enemy_copy['name']} appears!")
+        battle(enemy_copy)
+
+    elif event == "treasure":
+        gold_found = random.randint(5, 20)
+        player["gold"] += gold_found
+        slow_print(f"You find a small chest with {gold_found} gold inside.")
+        player["rooms_cleared"] += 1
+
+    elif event == "potion":
+        slow_print("You find a dusty bottle on a stone table.")
+        if random.random() < 0.7:
+            slow_print("It is a healing potion. You add it to your bag.")
+            player["potions"] += 1
+        else:
+            slow_print("You uncork it and sniff. It smells cursed. You leave it.")
+        player["rooms_cleared"] += 1
+
+    elif event == "mystic":
+        slow_print("A glowing crystal hums in the center of the room.")
+        if random.random() < 0.5:
+            bonus = random.randint(1, 3)
+            player["attack"] += bonus
+            slow_print(f"The crystal surges with energy. Attack rises by {bonus}.")
+        else:
+            heal_amount = random.randint(5, 10)
+            heal_player(heal_amount)
+            slow_print(f"You feel warmth in your chest. You heal {heal_amount} HP.")
+        player["rooms_cleared"] += 1
+
+    else:
+        slow_print("The room is empty. Just dust and old stones.")
+        player["rooms_cleared"] += 1
+
+def rest():
+    line()
+    slow_print("You find a safe corner and rest for a while.")
+    heal_amount = random.randint(4, 8)
+    heal_player(heal_amount)
+    slow_print(f"You recover {heal_amount} HP.")
+    if random.random() < 0.25:
+        slow_print("But as you rest, an enemy sneaks up on you.")
+        enemy = random.choice(enemies).copy()
+        battle(enemy)
+
+def show_stats():
+    line()
+    slow_print("PLAYER STATS")
+    line()
+    slow_print(f"Name: {player['name']}")
+    slow_print(f"HP: {player['hp']}/{player['max_hp']}")
+    slow_print(f"Attack: {player['attack']}")
+    slow_print(f"Potions: {player['potions']}")
+    slow_print(f"Gold: {player['gold']}")
+    slow_print(f"Rooms cleared: {player['rooms_cleared']}")
+    input("\nPress Enter to continue...")
+
+# ------------- Battle system -------------
+
+def battle(enemy):
+    while enemy["hp"] > 0 and player["hp"] > 0:
+        line()
+        slow_print(f"{enemy['name']} HP: {enemy['hp']}")
+        slow_print(f"{player['name']} HP: {player['hp']}/{player['max_hp']}")
+        print("1) Attack")
+        print("2) Use potion")
+        print("3) Try to run")
+
+        choice = input("Choose an action: ").strip()
+
+        if choice == "1":
+            player_attack(enemy)
+            if enemy["hp"] <= 0:
+                slow_print(f"You defeated the {enemy['name']}!")
+                reward = random.randint(5, 15)
+                player["gold"] += reward
+                slow_print(f"You loot {reward} gold.")
+                player["rooms_cleared"] += 1
+                break
+            enemy_attack(enemy)
+
+        elif choice == "2":
+            use_potion()
+            if enemy["hp"] > 0:
+                enemy_attack(enemy)
+
+        elif choice == "3":
+            if random.random() < 0.5:
+                slow_print("You managed to escape.")
+                break
+            else:
+                slow_print("You failed to run away.")
+                enemy_attack(enemy)
+        else:
+            slow_print("Please enter 1, 2, or 3.")
+
+    if player["hp"] <= 0:
+        game_over()
+
+def player_attack(enemy):
+    damage = random.randint(player["attack"] - 2, player["attack"] + 2)
+    if damage < 1:
+        damage = 1
+    slow_print(f"You strike the {enemy['name']} for {damage} damage.")
+    enemy["hp"] -= damage
+
+def enemy_attack(enemy):
+    damage = random.randint(enemy["attack"] - 2, enemy["attack"] + 2)
+    if damage < 1:
+        damage = 1
+    slow_print(f"The {enemy['name']} hits you for {damage} damage.")
+    player["hp"] -= damage
+
+def use_potion():
+    if player["potions"] <= 0:
+        slow_print("You reach for a potion, but your bag is empty.")
+        return
+    heal_amount = random.randint(8, 14)
+    player["potions"] -= 1
+    heal_player(heal_amount)
+    slow_print(f"You drink a potion and heal {heal_amount} HP.")
+
+def heal_player(amount):
+    player["hp"] += amount
+    if player["hp"] > player["max_hp"]:
+        player["hp"] = player["max_hp"]
+
+# ------------- Boss fight and game over -------------
+
+def fight_boss():
+    line()
+    show_image("dragon.jpg")  # opens dragon.jpg if found
+    slow_print("You enter a huge chamber lit by green flames.")
+    slow_print("A massive shape moves in the darkness.")
+    slow_print(f"The {boss['name']} awakens.")
+    boss_copy = boss.copy()
+
+    battle(boss_copy)
+
+    if player["hp"] > 0:
+        win_game()
+    else:
+        game_over()
+
+def win_game():
+    line()
+    slow_print("The Dungeon Dragon collapses with a final roar.")
+    slow_print("You stand victorious. The dungeon falls silent.")
+    slow_print(
+        f"Final stats: Gold {player['gold']}, "
+        f"Rooms cleared {player['rooms_cleared']}."
+    )
+    input("\nYou won. Press Enter to return to the main menu...")
+    main_menu()
+
+def game_over():
+    line()
+    slow_print("You fall to the cold stone floor.")
+    slow_print("Your adventure ends here.")
+    slow_print(
+        f"Final stats: Gold {player['gold']}, "
+        f"Rooms cleared {player['rooms_cleared']}."
+    )
+    input("\nGame over. Press Enter to return to the main menu...")
+    main_menu()
+
+# ------------- Entry point -------------
+
+if __name__ == "__main__":
+    main_menu()
